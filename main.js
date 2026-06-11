@@ -1,44 +1,25 @@
-const express = require('express');
-
 const conexao = require('./src/conexao')
 const { PagamentoFactory } = require('./src/pagamento')
 const { PedidoBuilder } = require('./src/pedido')
 
-const PORT = 3000;
+const db = conexao.getInstance().getConexao();
 
-const app = express();
+const pagamentoPix = PagamentoFactory.criar('pix');
+console.log(pagamentoPix);
+pagamentoPix.processar(200);
 
-const db = conexao.getInstance();
-
-function getPagamentos(req, res){
-    return res.json();
-}
-
-function postPagamentos(req, res){
-    const tipo = req.body.tipo
-    if(!tipo){
-        return 
-    }
-    const pagamentos = PagamentoFactory.criar(tipo);
-    return res.json("Criado com sucesso!"); 
-}
-
-function getPedidos(req, res){
-    return res.json();
-}
-
-function postPedidos(req, res){
-    const {item, endereco, pagamento} = req.body
-    const pedido = PedidoBuilder().adicionarItem(item).setEndereco(endereco).setPagamento(pagamento).build();
-    return res.json("Pedido Criado com sucesso!");
-}
-
-app.post('/pagamentos', postPagaemntos(req, res));
-app.post('/pedidos', postPedidos(req, res));
-app.get('/pedidos', getPedidos(req, res));
-app.get('/pagamentos', getPagamentos(req, res));
+const pagamentoCartao = PagamentoFactory.criar('cartao');
+console.log(pagamentoCartao);
+pagamentoPix.processar(100);
 
 
-app.listen(PORT, () => {
-    console.info(`Servidor rodando na porta: ${PORT}`)
-})
+const pagamentoBoleto = PagamentoFactory.criar('boleto');
+console.log(pagamentoBoleto);
+pagamentoPix.processar(50);
+
+
+
+
+const pedido = new PedidoBuilder().adicionarItem('Celular').adicionarItem('Capinha').adicionarItem('Abacaxi').setEndereco('Rua Rua 123').setPagamento('cartao').build();
+
+console.log(pedido)
